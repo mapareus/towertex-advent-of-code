@@ -1,4 +1,4 @@
-package com.towertex.pokus3
+package y2024
 
 object dataForAdvent5 {
     val data1 = """47|53

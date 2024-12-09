@@ -1,4 +1,4 @@
-package com.towertex.pokus3
+package y2024
 
 fun main() {
     println("advent 4")
