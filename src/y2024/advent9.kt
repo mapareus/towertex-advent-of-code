@@ -1,17 +1,24 @@
 package y2024
 
+import kotlin.time.Duration.Companion.seconds
+
 fun main() {
     println("advent 9")
 
-    dataForAdvent9.data1.expandCompressAndFold()
+    dataForAdvent9.data1.flatExpandCompressAndFold()
         .also { println("Task 1 for data 1 should be 60 and is ... $it") }
-    dataForAdvent9.data2.expandCompressAndFold()
+    dataForAdvent9.data2.flatExpandCompressAndFold()
         .also { println("Task 1 for data 2 should be 1928 and is ... $it") }
-    dataForAdvent9.data3.expandCompressAndFold()
+    dataForAdvent9.data3.flatExpandCompressAndFold()
         .also { println("Task 1 for data 3 should be 6382875730645 and is ... $it") }
+
+    dataForAdvent9.data2.expandCompressAndFold()
+        .also { println("Task 2 for data 2 should be 2858 and is ... $it") }
+    dataForAdvent9.data3.expandCompressAndFold()
+        .also { println("Task 2 for data 3 should be 6420913943576 and is ... $it") }
 }
 
-private fun String.expandCompressAndFold(): Long =
+private fun String.flatExpandCompressAndFold(): Long =
     this.flatExpand()
 //        .also { expanded ->
 //            expanded.joinToString("") { "${it ?: '.'}" }
@@ -24,10 +31,30 @@ private fun String.expandCompressAndFold(): Long =
 //        }
         .foldIndexed(0L) { i, sum, value -> sum + i * value }
 
-private fun List<Pair<Int,Int?>>.compress(): List<Int> {
-    val result = mutableListOf<Int>()
+private fun String.expandCompressAndFold(): Long =
+    this.expand()
+//        .also { it1 -> println(it1.printString()) }
+        .compress()
 
-    return result
+private fun List<Pair<Int,Int?>>.printString() = joinToString("") { it2 -> List(it2.first) {it2.second ?: '.'}.joinToString("") { it.toString() } }
+
+private fun List<Pair<Int,Int?>>.compress(): Long {
+    val originalPairs = this.toMutableList()
+    val result = this.toMutableList()
+    originalPairs.reversed().forEachIndexed { indexOfPairToMove, pairToMove ->
+        if (pairToMove.second == null) return@forEachIndexed
+        val indexOfEmptyGroupWithEnoughCapacity = result.indexOfFirst { it.second == null && it.first >= pairToMove.first }
+        val indexOfPairToMoveInResult = result.indexOf(pairToMove)
+        if (indexOfEmptyGroupWithEnoughCapacity == -1 || indexOfEmptyGroupWithEnoughCapacity >= indexOfPairToMoveInResult) return@forEachIndexed
+        result.set(indexOfPairToMoveInResult, Pair(pairToMove.first, null))
+        val emptyGroupToFill = result[indexOfEmptyGroupWithEnoughCapacity]
+        result.remove(emptyGroupToFill)
+        result.add(indexOfEmptyGroupWithEnoughCapacity, Pair(emptyGroupToFill.first - pairToMove.first, null))
+        result.add(indexOfEmptyGroupWithEnoughCapacity, pairToMove)
+//        println(result.printString())
+    }
+    return result.flatMap { (c, value) -> List(c) { value } }
+        .foldIndexed(0L) { i, sum, value -> sum + i * (value ?: 0) }
 }
 
 private fun List<Int?>.compress(): List<Int> {
