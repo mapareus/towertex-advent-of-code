@@ -3,26 +3,32 @@ package y2024
 fun main() {
     println("advent 15")
 
-//    dataForAdvent15.data1.getMapAfterSteps(-1)
-////        .also { println(it) }
-//        .also { println("Task 1 for data 1 should be 2028 and is ... ${it.toGPSSum()}") }
-//
-//    dataForAdvent15.data2.getMapAfterSteps(-1)
-//        .also { println("Task 1 for data 2 should be 10092 and is ... ${it.toGPSSum()}") }
-//
-//    dataForAdvent15.data3.getMapAfterSteps(-1)
-//        .also { println("Task 1 for data 3 should be 1406392 and is ... ${it.toGPSSum()}") }
+    dataForAdvent15.data1.getMapAfterSteps(-1)
+//        .also { println(it) }
+        .also { println("Task 1 for data 1 should be 2028 and is ... ${it.toGPSSum()}") }
+
+    dataForAdvent15.data2.getMapAfterSteps(-1)
+        .also { println("Task 1 for data 2 should be 10092 and is ... ${it.toGPSSum()}") }
+
+    dataForAdvent15.data3.getMapAfterSteps(-1)
+        .also { println("Task 1 for data 3 should be 1406392 and is ... ${it.toGPSSum()}") }
 
     dataForAdvent15.data1.getExpandedMapAfterSteps(-1)
-        .also { println("Task 2 for data 1 should be 2028 and is ... ${it.toGPSSum()}") }
+        .also { println("Task 2 for data 1 should be 1751 and is ... ${it.toGPSSum()}") }
+
+    dataForAdvent15.data2.getExpandedMapAfterSteps(-1)
+        .also { println("Task 2 for data 2 should be 9021 and is ... ${it.toGPSSum()}") }
+
+    dataForAdvent15.data3.getExpandedMapAfterSteps(-1)
+        .also { println("Task 2 for data 3 should be 9021 and is ... ${it.toGPSSum()}") }
 }
 
 private fun String.getExpandedMapAfterSteps(max: Int): Warehouse {
     val (warehouse, steps) = toWarehouseAndSteps().let {
-        println(it.first)
+//        println(it.first)
         Pair(it.first.toExpandedWarehouse(), it.second)
     }
-    println(warehouse)
+//    println(warehouse)
     return warehouse.getExpandedWarehouseAfterSteps(steps, max)
 }
 
@@ -65,7 +71,7 @@ private class Warehouse(
         var sum: Long = 0
         map.forEachIndexed { i, line ->
             line.forEachIndexed { j, c ->
-                if (c == 'O') {
+                if (c == 'O' || c == '[') {
                     val toAdd = (100*i) + j
 //                    println(toAdd)
                     sum += toAdd
@@ -107,8 +113,8 @@ private class Warehouse(
                     if (newMap.tryToMoveLeft(currentPos)) currentPos = Pair(currentPos.first, currentPos.second - 1)
                 }
             }
-            println(step)
-            println(Warehouse(newMap, currentPos))
+//            println(step)
+//            println(Warehouse(newMap, currentPos))
             stepsCounter++
         }
         return Warehouse(newMap, currentPos)
@@ -170,8 +176,8 @@ private class Warehouse(
                     }
                 }
             }
-            println(step)
-            println(Warehouse(newMap, currentPos))
+//            println(step)
+//            println(Warehouse(newMap, currentPos))
             stepsCounter++
         }
         return Warehouse(newMap, currentPos)
@@ -184,6 +190,7 @@ private fun List<MutableList<Char>>.tryToMoveRight(currentPos: Pair<Int, Int>): 
     val nextValue = getOrNull(nextPos.first)?.getOrNull(nextPos.second) ?: return false
     val canMove = when (nextValue) {
         '.' -> true
+        '#' -> false
         else -> tryToMoveRight(nextPos)
     }
     if (canMove) {
@@ -200,6 +207,7 @@ private fun List<MutableList<Char>>.tryToMoveLeft(currentPos: Pair<Int, Int>): B
     val nextValue = getOrNull(nextPos.first)?.getOrNull(nextPos.second) ?: return false
     val canMove = when (nextValue) {
         '.' -> true
+        '#' -> false
         else -> tryToMoveLeft(nextPos)
     }
     if (canMove) {
@@ -210,63 +218,82 @@ private fun List<MutableList<Char>>.tryToMoveLeft(currentPos: Pair<Int, Int>): B
     return false
 }
 
-private fun List<List<Char>>.getPointsToMoveDown(allPoints: MutableList<MutableList<Pair<Int, Int>>>) {
+private fun List<List<Char>>.getPointsToMoveDown(allPoints: MutableList<List<Pair<Int, Int>>>) {
     val lastPoints = allPoints.last()
     val nextSetOfPoints = lastPoints.flatMap { point ->
-        val valueAtPoint = getOrNull(point.first)?.getOrNull(point.second) ?: return@flatMap emptyList()
         val valueAtNextPoint = getOrNull(point.first + 1)?.getOrNull(point.second) ?: return@flatMap emptyList()
         when {
-            valueAtPoint -> {
-                val nextPoint = Pair(point.first + 1, point.second)
-                this[nextPoint.first][nextPoint.second] = '.'
-                listOf(nextPoint)
+            valueAtNextPoint == '[' -> {
+                listOf(Pair(point.first + 1, point.second), Pair(point.first + 1, point.second + 1))
             }
-            '#' -> emptyList()
-            '[' -> {
-                val nextPoint = Pair(point.first + 1, point.second)
-                this[nextPoint.first][nextPoint.second] = '.'
-                listOf(nextPoint)
+            valueAtNextPoint == ']' -> {
+                listOf(Pair(point.first + 1, point.second), Pair(point.first + 1, point.second - 1))
             }
-            ']' -> {
-                val nextPoint = Pair(point.first, point.second - 1)
-                this[nextPoint.first][nextPoint.second] = '.'
-                listOf(nextPoint)
+            valueAtNextPoint == '.' -> {
+                emptyList()
             }
-            else -> throw IllegalArgumentException("forbidden move $valueAtPoint")
+            else -> {
+                allPoints.clear()
+                return
+            }
         }
-
     }
-
+    if (nextSetOfPoints.isEmpty()) return
+    allPoints.add(nextSetOfPoints.toSet().toList())
+    getPointsToMoveDown(allPoints)
 }
 
 private fun List<MutableList<Char>>.tryToMoveDown(currentPos: Pair<Int, Int>): Boolean {
-    val currentValue = getOrNull(currentPos.first)?.getOrNull(currentPos.second) ?: return false
-    val nextPos = Pair(currentPos.first + 1, currentPos.second)
-    val nextValue = getOrNull(nextPos.first)?.getOrNull(nextPos.second) ?: return false
-    return when {
-        currentValue == '.' && nextValue == '.' -> true
-        currentValue == '.' && nextValue == '#' -> false
-        currentValue == '.' && nextValue == '[' -> tryToMoveDown(nextPos)
-        currentValue == '.' && nextValue == ']' -> tryToMoveDown(Pair(nextPos.first, nextPos.second - 1))
-        currentValue == '[' && nextValue == '.' -> tryToMoveDown(nextPos)
-        else -> throw IllegalArgumentException("forbidden move $currentValue -> $nextValue")
+    val pointsToMoveDown = mutableListOf(listOf(currentPos))
+    getPointsToMoveDown(pointsToMoveDown)
+    val canMove = pointsToMoveDown.isNotEmpty()
+    if (canMove.not()) return false
+    pointsToMoveDown.reversed().forEach { points ->
+        points.forEach { point ->
+            this[point.first+1][point.second] = this[point.first][point.second]
+            this[point.first][point.second] = '.'
+        }
     }
+    return true
+}
+
+private fun List<List<Char>>.getPointsToMoveUp(allPoints: MutableList<List<Pair<Int, Int>>>) {
+    val lastPoints = allPoints.last()
+    val nextSetOfPoints = lastPoints.flatMap { point ->
+        val valueAtNextPoint = getOrNull(point.first - 1)?.getOrNull(point.second) ?: return@flatMap emptyList()
+        when {
+            valueAtNextPoint == '[' -> {
+                listOf(Pair(point.first - 1, point.second), Pair(point.first - 1, point.second + 1))
+            }
+            valueAtNextPoint == ']' -> {
+                listOf(Pair(point.first - 1, point.second), Pair(point.first - 1, point.second - 1))
+            }
+            valueAtNextPoint == '.' -> {
+                emptyList()
+            }
+            else -> {
+                allPoints.clear()
+                return
+            }
+        }
+    }
+    if (nextSetOfPoints.isEmpty()) return
+    allPoints.add(nextSetOfPoints.toSet().toList())
+    getPointsToMoveUp(allPoints)
 }
 
 private fun List<MutableList<Char>>.tryToMoveUp(currentPos: Pair<Int, Int>): Boolean {
-    val currentValue = getOrNull(currentPos.first)?.getOrNull(currentPos.second) ?: return false
-    val nextPos = Pair(currentPos.first - 1, currentPos.second)
-    val nextValue = getOrNull(nextPos.first)?.getOrNull(nextPos.second) ?: return false
-    val canMove = when (nextValue) {
-        '.' -> true
-        else -> tryToMoveUp(nextPos)
+    val pointsToMoveUp = mutableListOf(listOf(currentPos))
+    getPointsToMoveUp(pointsToMoveUp)
+    val canMove = pointsToMoveUp.isNotEmpty()
+    if (canMove.not()) return false
+    pointsToMoveUp.reversed().forEach { points ->
+        points.forEach { point ->
+            this[point.first-1][point.second] = this[point.first][point.second]
+            this[point.first][point.second] = '.'
+        }
     }
-    if (canMove) {
-        this[nextPos.first][nextPos.second] = currentValue
-        this[currentPos.first][currentPos.second] = '.'
-        return true
-    }
-    return false
+    return true
 }
 
 private fun List<List<Char>>.nextFreePos(pos: Pair<Int, Int>, dx: Int, dy: Int): Pair<Int, Int>? {
