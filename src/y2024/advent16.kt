@@ -28,15 +28,15 @@ private class Maze(val map: List<List<Char>>) {
     }
 }
 
-private class Node(point: Pair<Int, Int>, direction: Direction) {
-    fun getNeighbours(): List<Node> {
-        
-    }
-}
+//private class Node(point: Pair<Int, Int>, direction: Direction) {
+//    fun getNeighbours(): List<Node> {
+//
+//    }
+//}
 
-private class Step(val nodeA: Node, val nodeB: Node, val distance: Int) {
-
-}
+//private class Step(val nodeA: Node, val nodeB: Node, val distance: Int) {
+//
+//}
 
 private enum class Direction {
     UP, DOWN, LEFT, RIGHT
