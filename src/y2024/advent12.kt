@@ -10,7 +10,7 @@ fun main() {
     dataForAdvent12.data3.getGroups().sumOf { it.price1 }
         .also { println("Task 1 for data 3 should be 1930 and is ... $it") }
     dataForAdvent12.data6.getGroups().sumOf { it.price1 }
-        .also { println("Task 1 for data 6 should be 1450816 and is ... $it") }
+        .also { println("Task 1 for data 6 should be 1363682 and is ... $it") }
 
     dataForAdvent12.data1.getGroups().sumOf { it.price2 }
         .also { println("Task 2 for data 1 should be 80 and is ... $it") }
@@ -23,7 +23,7 @@ fun main() {
     dataForAdvent12.data5.getGroups().sumOf { it.price2 }
         .also { println("Task 2 for data 5 should be 368 and is ... $it") }
     dataForAdvent12.data6.getGroups().sumOf { it.price2 }
-        .also { println("Task 1 for data 6 should be 1450816 and is ... $it") }
+        .also { println("Task 1 for data 6 should be 787680 and is ... $it") }
 }
 
 private fun String.getGroups(): List<Group> =

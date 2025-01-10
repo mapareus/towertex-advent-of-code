@@ -10,13 +10,13 @@ fun main() {
         .also { println("Task 1 for data 1 should be 11 and is $it") }
 
     dataForAdvent1.data3.toTwoColumns().sumSortedDifferences()
-        .also { println("Task 1 for data 3 is $it") }
+        .also { println("Task 1 for data 1189304 is $it") }
 
     dataForAdvent1.data2.toTwoColumns().sumGroupSizes()
         .also { println("Task 2 for data 2 should be 31 and is $it") }
 
     dataForAdvent1.data3.toTwoColumns().sumGroupSizes()
-        .also { println("Task 2 for data 3 is $it") }
+        .also { println("Task 2 for data 24349736 is $it") }
 }
 
 private fun Pair<LinkedList<Int>, LinkedList<Int>>.sumGroupSizes(): Int {

@@ -4,14 +4,19 @@ fun main() {
     println("advent 7")
 
     dataForAdvent7.data1.countValidEquations()
-        .also { println("Task 2 for data 1 should be 11387 and is ... $it") }
+        .also { println("Task 1 for data 1 should be 3749 and is ... $it") }
     dataForAdvent7.data2.countValidEquations()
-        .also { println("Task 2 for data 2 should be 37598910447546 and is ... $it") }
+        .also { println("Task 1 for data 2 should be 3749 and is ... $it") }
+
+    dataForAdvent7.data1.countValidEquations(true)
+        .also { println("Task 2 for data 1 should be 11387 and is ... $it") }
+    dataForAdvent7.data2.countValidEquations(true)
+        .also { println("Task 2 for data 2 should be 70597497486371 and is ... $it") }
 }
 
-private fun String.countValidEquations() = lines().sumOf { it.isValidEquation() }
+private fun String.countValidEquations(useConcat: Boolean = false) = lines().sumOf { it.isValidEquation(useConcat) }
 
-private fun String.isValidEquation(): Long {
+private fun String.isValidEquation(useConcat: Boolean): Long {
     val expected = this
         .substringBefore(": ")
         .toLong()
@@ -29,7 +34,7 @@ private fun String.isValidEquation(): Long {
     while (equation != null) {
 //        println(equation.joinToString("") { "${it.first}${it.second}" } )
         if (equation.evaluate(expected) == expected) return expected
-        equation = nextEquation(equation)
+        equation = nextEquation(equation, useConcat)
     }
     return 0
 }
@@ -65,13 +70,30 @@ private fun List<Pair<Long,operator?>>.evaluate(expected: Long): Long {
     return result
 }
 
-private fun nextEquation(previousEquation: List<Pair<Long,operator>>): List<Pair<Long,operator>>? {
+private fun nextEquation(previousEquation: List<Pair<Long,operator>>, useConcat: Boolean): List<Pair<Long,operator>>? {
     val nextEquation = mutableListOf<Pair<Long,operator>>()
     val lastMultiply = previousEquation.indexOfLast { it.second == operator.multiply }
     val lastAdd = previousEquation.indexOfLast { it.second == operator.add }
 
+    if (useConcat.not()) {
+        return when {
+            lastMultiply == -1 -> null
+            else -> {
+                previousEquation.forEachIndexed { index, pair ->
+                    when {
+                        index == previousEquation.size-1 -> nextEquation.add(pair)
+                        index < lastMultiply -> nextEquation.add(pair)
+                        index == lastMultiply -> nextEquation.add(Pair(pair.first, operator.add))
+                        index > lastMultiply -> nextEquation.add(Pair(pair.first, operator.multiply))
+                    }
+                }
+                nextEquation
+            }
+        }
+    }
+
     return when {
-        lastMultiply == -1 && lastAdd == -1 -> return null
+        lastMultiply == -1 && lastAdd == -1 -> null
         lastAdd > lastMultiply -> {
             previousEquation.forEachIndexed { index, pair ->
                 when {

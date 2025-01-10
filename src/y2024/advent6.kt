@@ -6,12 +6,12 @@ fun main() {
     dataForAdvent6.data1.lines().countVisitedNodes()
         .also { println("Task 1 for data 1 should be 41 and is ... $it") }
     dataForAdvent6.data2.lines().countVisitedNodes()
-        .also { println("Task 1 for data 2 should be 4964 and is ... $it") }
+        .also { println("Task 1 for data 2 should be 5305 and is ... $it") }
 
     dataForAdvent6.data1.lines().countLoopingNodes()
         .also { println("Task 2 for data 1 should be 6 and is ... $it") }
     dataForAdvent6.data2.lines().countLoopingNodes()
-        .also { println("Task 2 for data 2 should be 1740 and is ... $it") }
+        .also { println("Task 2 for data 2 should be 2143 and is ... $it") }
 }
 
 private fun List<String>.countLoopingNodes(): Int {

@@ -8,12 +8,12 @@ fun main() {
     dataForAdvent8.data1.countTargetNodes()
         .also { println("Task 1 for data 1 should be 14 and is ... $it") }
     dataForAdvent8.data2.countTargetNodes()
-        .also { println("Task 1 for data 2 should be 244 and is ... $it") }
+        .also { println("Task 1 for data 2 should be 351 and is ... $it") }
 
     dataForAdvent8.data1.getAllTargetNodes().count()
         .also { println("Task 2 for data 1 should be 34 and is ... $it") }
     dataForAdvent8.data2.getAllTargetNodes().count()
-        .also { println("Task 2 for data 2 should be 912 and is ... $it") }
+        .also { println("Task 2 for data 2 should be 1259 and is ... $it") }
 }
 
 private fun String.getAllTargetNodes(): List<Pair<Int,Int>> {

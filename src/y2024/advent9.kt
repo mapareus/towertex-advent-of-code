@@ -10,12 +10,12 @@ fun main() {
     dataForAdvent9.data2.flatExpandCompressAndFold()
         .also { println("Task 1 for data 2 should be 1928 and is ... $it") }
     dataForAdvent9.data3.flatExpandCompressAndFold()
-        .also { println("Task 1 for data 3 should be 6382875730645 and is ... $it") }
+        .also { println("Task 1 for data 3 should be 6378826667552 and is ... $it") }
 
     dataForAdvent9.data2.expandCompressAndFold()
         .also { println("Task 2 for data 2 should be 2858 and is ... $it") }
     dataForAdvent9.data3.expandCompressAndFold()
-        .also { println("Task 2 for data 3 should be 6420913943576 and is ... $it") }
+        .also { println("Task 2 for data 3 should be 6413328569890 and is ... $it") }
 }
 
 private fun String.flatExpandCompressAndFold(): Long =

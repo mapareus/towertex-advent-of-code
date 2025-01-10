@@ -8,14 +8,14 @@ fun main() {
     dataForAdvent10.data2.sumTrailHeads()
         .also { println("Task 1 for data 2 should be 36 and is ... $it") }
     dataForAdvent10.data3.sumTrailHeads()
-        .also { println("Task 1 for data 3 should be 667 and is ... $it") }
+        .also { println("Task 1 for data 3 should be 652 and is ... $it") }
 
     dataForAdvent10.data1.sumTrails()
         .also { println("Task 2 for data 1 should be 16 and is ... $it") }
     dataForAdvent10.data2.sumTrails()
         .also { println("Task 2 for data 2 should be 81 and is ... $it") }
     dataForAdvent10.data3.sumTrails()
-        .also { println("Task 2 for data 3 should be 1344 and is ... $it") }
+        .also { println("Task 2 for data 3 should be 1432 and is ... $it") }
 }
 
 private fun String.sumTrailHeads() = getPaths()

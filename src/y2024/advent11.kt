@@ -20,28 +20,28 @@ fun main() {
         measureTimeMillis {
             dataForAdvent11.data3
                 .countAfterBlinks1(25)
-                .also { println("Task 1 for data 3 25 should be 194782 and is ... $it") }
+                .also { println("Task 1 for data 3 25x should be 194557 and is ... $it") }
         }.also { println("took $it ms") }
         measureTimeMillis {
             dataForAdvent11.data3
                 .countAfterBlinks1(25)
-                .also { println("Task 1 for data 3 25 should be 194782 and is ... $it") }
+                .also { println("Task 1 for data 3 25 should be 194557 and is ... $it") }
         }.also { println("took $it ms") }
         measureTimeMillis {
             dataForAdvent11.data3
                 .countAfterBlinks3(25)
-                .also { println("Task 1 for data 3 25x should be 194782 and is ... $it") }
+                .also { println("Task 1 for data 3 25x should be 194557 and is ... $it") }
         }.also { println("took $it ms") }
         measureTimeMillis {
             dataForAdvent11.data3
                 .countAfterBlinks4(25)
-                .also { println("Task 1 for data 3 25x should be 194782 and is ... $it") }
+                .also { println("Task 1 for data 3 25x should be 194557 and is ... $it") }
         }.also { println("took $it ms") }
 
         measureTimeMillis {
             dataForAdvent11.data3
                 .countAfterBlinks(75)
-                .also { println("Task 1 for data 3 75x should be 233007586663131 and is ... $it") }
+                .also { println("Task 1 for data 3 75x should be 231532558973909 and is ... $it") }
         }.also { println("took $it ms") }
     }
 }

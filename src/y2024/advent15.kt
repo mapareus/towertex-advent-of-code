@@ -11,7 +11,7 @@ fun main() {
         .also { println("Task 1 for data 2 should be 10092 and is ... ${it.toGPSSum()}") }
 
     dataForAdvent15.data3.getMapAfterSteps(-1)
-        .also { println("Task 1 for data 3 should be 1406392 and is ... ${it.toGPSSum()}") }
+        .also { println("Task 1 for data 3 should be 1568399 and is ... ${it.toGPSSum()}") }
 
     dataForAdvent15.data1.getExpandedMapAfterSteps(-1)
         .also { println("Task 2 for data 1 should be 1751 and is ... ${it.toGPSSum()}") }
@@ -20,7 +20,7 @@ fun main() {
         .also { println("Task 2 for data 2 should be 9021 and is ... ${it.toGPSSum()}") }
 
     dataForAdvent15.data3.getExpandedMapAfterSteps(-1)
-        .also { println("Task 2 for data 3 should be 9021 and is ... ${it.toGPSSum()}") }
+        .also { println("Task 2 for data 3 should be 1575877 and is ... ${it.toGPSSum()}") }
 }
 
 private fun String.getExpandedMapAfterSteps(max: Int): Warehouse {

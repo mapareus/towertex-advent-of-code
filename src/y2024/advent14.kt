@@ -18,11 +18,11 @@ fun main() {
 //        .also { println("Task 2 for data 1 should be 1 and is ... $it") }
 
     dataForAdvent14.data2.getRobots()
-        .findStepsWithEqualSafetyIndex(101, 103)
+        .findStepsWithEqualSafetyIndex(101, 103, true)
         .also { println("Task 2 for data 2 should be 12 and is ... $it") }
 }
 
-private fun List<Robot>.findStepsWithEqualSafetyIndex(roomX: Int, roomY: Int): Int? {
+private fun List<Robot>.findStepsWithEqualSafetyIndex(roomX: Int, roomY: Int, print: Boolean = false): Int? {
     var newRobots = this
     var step = 0
     val maxSteps = 100000
@@ -37,8 +37,10 @@ private fun List<Robot>.findStepsWithEqualSafetyIndex(roomX: Int, roomY: Int): I
                     if (j == roomY - 1) printString.add("\n")
                 }
             }
-            println(printString.joinToString("") { it })
-            println("\nstep: $step\n")
+            if (print) {
+                println(printString.joinToString("") { it })
+                println("\nstep: $step\n")
+            }
 //            return step
         }
         newRobots = newRobots.map { it.getRobotAfter(1, roomX, roomY) }

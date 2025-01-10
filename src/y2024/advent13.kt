@@ -9,7 +9,7 @@ fun main() {
         .also { println("Task 1 for data 1 should be 480 and is ... $it") }
     dataForAdvent13.data2.getClawMachines()
         .sumOf { it.totalPrize }
-        .also { println("Task 1 for data 2 should be 39290 and is ... $it") }
+        .also { println("Task 1 for data 2 should be 27105 and is ... $it") }
 
     dataForAdvent13.data1.getClawMachines(10000000000000)
         .onEach { println("$it ... ${it.totalPrize}") }
@@ -17,7 +17,7 @@ fun main() {
         .also { println("Task 2 for data 1 should be 875318608908 and is ... $it") }
     dataForAdvent13.data2.getClawMachines(10000000000000)
         .sumOf { it.totalPrize }
-        .also { println("Task 2 for data 2 should be 73458657399094 and is ... $it") }
+        .also { println("Task 2 for data 2 should be 101726882250942 and is ... $it") }
 }
 
 private fun String.getClawMachines(factorPrize: Long = 0) = split("\n\n").map { it.getClawMachine(factorPrize) }
