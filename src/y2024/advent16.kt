@@ -1,28 +1,155 @@
 package y2024
 
+import java.util.PriorityQueue
+
 fun main() {
     println("advent 16")
 
 //    dataForAdvent16.data0.let { s -> Maze(s.lines().map { it.toMutableList() }) }
-//        .also { println(it) }
-//        .let { it.getAllMazeRunners().minBy { mr -> mr.countPath() } }
-//        .also { println(it) }
-//        .also { println("Task 1 for data 0 should be 2008 and is ... ${it.countPath()}") }
-//
-//    dataForAdvent16.data0.let { s -> Maze(s.lines().map { it.toMutableList() }) }
 //        .also { println("Task 1 for data 0 should be 2008 and is ... ${it.getMinMazeRunner()?.countPath()}") }
+//
+//    dataForAdvent16.data0.let { s -> Maze2.from(s) }
+//        .also { println("dijsktra 0: ${it.dijsktra()}") }
+//
+//    dataForAdvent16.data0a.let { s -> Maze2.from(s) }
+//        .also { println("dijsktra 0a 21148: ${it.dijsktra()}") }
+//
+    dataForAdvent16.data0b.let { s -> Maze2.from(s) }
+        .also { println("dijsktra 0b 4013: ${it.dijsktra()}") }
+//
+//    dataForAdvent16.data1.let { s -> Maze2.from(s)}
+//        .also { println("dijkstra 1 7036: ${it.dijsktra()}") }
+//
+//    dataForAdvent16.data2.let { s -> Maze2.from(s)}
+//        .also { println("dijkstra 2 11048: ${it.dijsktra()}") }
 //
 //    dataForAdvent16.data1.let { s -> Maze(s.lines().map { it.toMutableList() }) }
 //        .also { println("Task 1 for data 1 should be 7036 and is ... ${it.getMinMazeRunner()?.countPath()}") }
 //
 //    dataForAdvent16.data2.let { s -> Maze(s.lines().map { it.toMutableList() }) }
 //        .also { println("Task 1 for data 2 should be 11048 and is ... ${it.getMinMazeRunner()?.countPath()}") }
-
-    dataForAdvent16.data3.let { s -> Maze(s.lines().map { it.toMutableList() }) }
-        .also { println("Task 1 for data 3 should be 11048 and is ... ${it.getMinMazeRunner()?.countPath()}") }
+//
+////        dataForAdvent16.data3.let { s -> Maze(s.lines().map { it.toMutableList() }) }
+////        .also { println("Task 1 for data 3 should be 11048 and is ... ${it.getMinMazeRunner()?.countPath()}") }
+//
+    dataForAdvent16.data3.let { s -> Maze2.from(s)}
+        .also { println("dijkstra ... ${it.dijsktra()}") }
 }
 
-typealias Point = Pair<Int, Int>
+private typealias Point = Pair<Int, Int>
+
+private enum class ORIENTATION { HORIZONTAL, VERTICAL }
+
+private data class Node(val point: Point, val orientation: ORIENTATION)
+
+private class Maze2 private constructor(
+    val start: Point,
+    val end: Point,
+    val map: List<MutableList<Char>>,
+    val graph: MutableMap<Node, List<Pair<Node, Int>>>
+) {
+    companion object {
+        fun from(s: String): Maze2 {
+            val map: List<MutableList<Char>> = s.lines().map { it.toMutableList() }
+            lateinit var start: Point
+            lateinit var end: Point
+            map.forEachIndexed { i, row ->
+                row.forEachIndexed { j, c ->
+                    when(c) {
+                        'S' -> start = Point(i, j)
+                        'E' -> end = Point(i, j)
+                    }
+                }
+            }
+            while(true) {
+                val deadEnds = mutableListOf<Point>()
+                map.forEachIndexed { i, row ->
+                    row.forEachIndexed { j, c ->
+                        when(c) {
+                            '.' -> {
+                                if (map.getNeighbourPoints(Point(i,j)).size == 1) {
+                                    deadEnds.add(Point(i,j))
+                                }
+                            }
+                        }
+                    }
+                }
+                deadEnds.forEach { map[it.first][it.second] = '#' }
+                if(deadEnds.isEmpty()) break
+            }
+            return Maze2(start, end, map, mutableMapOf())
+        }
+    }
+
+    fun getNextNodes(
+        aStart: Node,
+        visitedNodes: MutableList<Node>,
+        sumOfEdges: Int
+    ): List<Pair<Node, Int>> {
+        visitedNodes.add(aStart)
+        return listOf (
+            Pair(
+                Node(Point(aStart.point.first+1,aStart.point.second), ORIENTATION.VERTICAL),
+                if (aStart.orientation == ORIENTATION.HORIZONTAL) 1001 else 1
+            ),
+            Pair(
+                Node(Point(aStart.point.first,aStart.point.second+1), ORIENTATION.HORIZONTAL),
+                if (aStart.orientation == ORIENTATION.VERTICAL) 1001 else 1
+            ),
+            Pair(
+                Node(Point(aStart.point.first-1,aStart.point.second), ORIENTATION.VERTICAL),
+                if (aStart.orientation == ORIENTATION.HORIZONTAL) 1001 else 1
+            ),
+            Pair(
+                Node(Point(aStart.point.first,aStart.point.second-1), ORIENTATION.HORIZONTAL),
+                if (aStart.orientation == ORIENTATION.VERTICAL) 1001 else 1
+            )
+        )
+            .filterNot { map[it.first.point.first][it.first.point.second] == '#' }
+            .filterNot { visitedNodes.any { vp -> vp == it.first } }
+            .let {
+                when {
+                    aStart.point == end -> listOf(aStart to sumOfEdges)
+                    it.size == 1 -> getNextNodes(it.first().first, visitedNodes, sumOfEdges + it.first().second)
+                    it.isEmpty() -> emptyList()
+                    visitedNodes.size == 1 -> it.flatMap { it2 -> getNextNodes(it2.first, visitedNodes, sumOfEdges + it2.second) }
+                    else -> listOf(aStart to sumOfEdges)
+                }
+            }
+    }
+
+    fun dijsktra(): List<Int?> {
+        val distances = mutableMapOf<Node, Int>().withDefault { Int.MAX_VALUE }
+        val priorityQueue = PriorityQueue<Pair<Node, Int>>(compareBy { it.second })
+        val visited = mutableSetOf<Node>()
+
+        val startNode = Node(start, ORIENTATION.HORIZONTAL)
+        priorityQueue.add(startNode to 0)
+        distances[startNode] = 0
+
+        while (priorityQueue.isNotEmpty()) {
+            val (currentNode, currentDistance) = priorityQueue.poll()
+            if (visited.contains(currentNode)) continue
+            visited.add(currentNode)
+
+            val nextNodes = getNextNodes(currentNode, mutableListOf(), 0)
+            nextNodes.forEach { (nextNode, edgeWeight) ->
+                val newDistance = currentDistance + edgeWeight
+                if (newDistance < (distances[nextNode] ?: Int.MAX_VALUE)) {
+                    distances[nextNode] = newDistance
+                    priorityQueue.add(nextNode to newDistance)
+                }
+            }
+        }
+
+        return listOf(distances[Node(end, ORIENTATION.HORIZONTAL)], distances[Node(end,ORIENTATION.VERTICAL)])
+    }
+}
+
+private fun List<MutableList<Char>>.getNeighbourPoints(aStart: Point): List<Point> =
+    listOf (Point(1,0), Point(0,1), Point(-1,0), Point(0,-1))
+        .map { Point(aStart.first + it.first, aStart.second + it.second) }
+        .filterNot { this[it.first][it.second] == '#' }
 
 private class Maze(val map: List<MutableList<Char>>) {
     lateinit var start: Point
@@ -122,7 +249,7 @@ private class Maze(val map: List<MutableList<Char>>) {
             val first = mazeRunners.first()
 //            println(displayMazeRunner(first))
             if (first.currentPoint == end) {
-                println(first)
+//                println(first)
                 val newCount = first.countPath()
                 if (minMazeRunnerCount == null || newCount < minMazeRunnerCount) {
                     minMazeRunner = first
