@@ -5,17 +5,17 @@ import java.util.PriorityQueue
 fun main() {
     println("advent 16")
 
-//    dataForAdvent16.data0.let { s -> Maze(s.lines().map { it.toMutableList() }) }
-//        .also { println("Task 1 for data 0 should be 2008 and is ... ${it.getMinMazeRunner()?.countPath()}") }
-//
-//    dataForAdvent16.data0.let { s -> Maze2.from(s) }
-//        .also { println("dijsktra 0: ${it.dijsktra()}") }
+    dataForAdvent16.data0.let { s -> Maze(s.lines().map { it.toMutableList() }) }
+        .also { println("Task 1 for data 0 should be 2008 and is ... ${it.getMinMazeRunner()?.countPath()}") }
+
+    dataForAdvent16.data0.let { s -> Maze2.from(s) }
+        .also { println("dijsktra 0: ${it.dijsktra()}") }
 //
 //    dataForAdvent16.data0a.let { s -> Maze2.from(s) }
 //        .also { println("dijsktra 0a 21148: ${it.dijsktra()}") }
 //
-    dataForAdvent16.data0b.let { s -> Maze2.from(s) }
-        .also { println("dijsktra 0b 4013: ${it.dijsktra()}") }
+//    dataForAdvent16.data0b.let { s -> Maze2.from(s) }
+//        .also { println("dijsktra 0b 4013: ${it.dijsktra()}") }
 //
 //    dataForAdvent16.data1.let { s -> Maze2.from(s)}
 //        .also { println("dijkstra 1 7036: ${it.dijsktra()}") }
@@ -90,19 +90,19 @@ private class Maze2 private constructor(
         return listOf (
             Pair(
                 Node(Point(aStart.point.first+1,aStart.point.second), ORIENTATION.VERTICAL),
-                if (aStart.orientation == ORIENTATION.HORIZONTAL) 1001 else 1
+                if (aStart.orientation == ORIENTATION.HORIZONTAL) 100001 else 1
             ),
             Pair(
                 Node(Point(aStart.point.first,aStart.point.second+1), ORIENTATION.HORIZONTAL),
-                if (aStart.orientation == ORIENTATION.VERTICAL) 1001 else 1
+                if (aStart.orientation == ORIENTATION.VERTICAL) 100001 else 1
             ),
             Pair(
                 Node(Point(aStart.point.first-1,aStart.point.second), ORIENTATION.VERTICAL),
-                if (aStart.orientation == ORIENTATION.HORIZONTAL) 1001 else 1
+                if (aStart.orientation == ORIENTATION.HORIZONTAL) 100001 else 1
             ),
             Pair(
                 Node(Point(aStart.point.first,aStart.point.second-1), ORIENTATION.HORIZONTAL),
-                if (aStart.orientation == ORIENTATION.VERTICAL) 1001 else 1
+                if (aStart.orientation == ORIENTATION.VERTICAL) 100001 else 1
             )
         )
             .filterNot { map[it.first.point.first][it.first.point.second] == '#' }
@@ -120,6 +120,7 @@ private class Maze2 private constructor(
 
     fun dijsktra(): List<Int?> {
         val distances = mutableMapOf<Node, Int>().withDefault { Int.MAX_VALUE }
+        val countOfPaths = mutableMapOf<Node, Int>().withDefault { 0 }
         val priorityQueue = PriorityQueue<Pair<Node, Int>>(compareBy { it.second })
         val visited = mutableSetOf<Node>()
 
@@ -135,7 +136,10 @@ private class Maze2 private constructor(
             val nextNodes = getNextNodes(currentNode, mutableListOf(), 0)
             nextNodes.forEach { (nextNode, edgeWeight) ->
                 val newDistance = currentDistance + edgeWeight
-                if (newDistance < (distances[nextNode] ?: Int.MAX_VALUE)) {
+                if (newDistance == (distances[nextNode] ?: Int.MAX_VALUE)) {
+                    countOfPaths[nextNode] = (countOfPaths[nextNode] ?: 0) + 1
+                } else if (newDistance < (distances[nextNode] ?: Int.MAX_VALUE)) {
+                    countOfPaths[nextNode] = 1
                     distances[nextNode] = newDistance
                     priorityQueue.add(nextNode to newDistance)
                 }
@@ -249,7 +253,7 @@ private class Maze(val map: List<MutableList<Char>>) {
             val first = mazeRunners.first()
 //            println(displayMazeRunner(first))
             if (first.currentPoint == end) {
-//                println(first)
+                println(first)
                 val newCount = first.countPath()
                 if (minMazeRunnerCount == null || newCount < minMazeRunnerCount) {
                     minMazeRunner = first
