@@ -1,39 +1,43 @@
 package y2024
 
+import java.util.LinkedList
 import java.util.PriorityQueue
+import java.util.Queue
 
 fun main() {
     println("advent 16")
 
-    dataForAdvent16.data0.let { s -> Maze(s.lines().map { it.toMutableList() }) }
-        .also { println("Task 1 for data 0 should be 2008 and is ... ${it.getMinMazeRunner()?.countPath()}") }
+//    dataForAdvent16.data0.let { s -> Maze(s.lines().map { it.toMutableList() }) }
+//        .also { println("Task 1 for data 0 should be 2008 and is ... ${it.getMinMazeRunner()?.countPath()}") }
 
     dataForAdvent16.data0.let { s -> Maze2.from(s) }
-        .also { println("dijsktra 0: ${it.dijsktra()}") }
-//
-//    dataForAdvent16.data0a.let { s -> Maze2.from(s) }
-//        .also { println("dijsktra 0a 21148: ${it.dijsktra()}") }
-//
-//    dataForAdvent16.data0b.let { s -> Maze2.from(s) }
-//        .also { println("dijsktra 0b 4013: ${it.dijsktra()}") }
-//
-//    dataForAdvent16.data1.let { s -> Maze2.from(s)}
-//        .also { println("dijkstra 1 7036: ${it.dijsktra()}") }
-//
-//    dataForAdvent16.data2.let { s -> Maze2.from(s)}
-//        .also { println("dijkstra 2 11048: ${it.dijsktra()}") }
-//
-//    dataForAdvent16.data1.let { s -> Maze(s.lines().map { it.toMutableList() }) }
-//        .also { println("Task 1 for data 1 should be 7036 and is ... ${it.getMinMazeRunner()?.countPath()}") }
-//
-//    dataForAdvent16.data2.let { s -> Maze(s.lines().map { it.toMutableList() }) }
-//        .also { println("Task 1 for data 2 should be 11048 and is ... ${it.getMinMazeRunner()?.countPath()}") }
-//
-////        dataForAdvent16.data3.let { s -> Maze(s.lines().map { it.toMutableList() }) }
-////        .also { println("Task 1 for data 3 should be 11048 and is ... ${it.getMinMazeRunner()?.countPath()}") }
-//
+        .also { println("dijsktra 0 should be 2008 and is: ${it.dijsktra()}") }
+        .also { println("dijsktra 0 sum: ${it.sumGraph2()}") }
+
+    dataForAdvent16.data0a.let { s -> Maze2.from(s) }
+        .also { println("dijsktra 0a should be 21148 and is: ${it.dijsktra()}") }
+        .also { println("dijsktra 0a sum: ${it.sumGraph()}") }
+        .also { println("dijsktra 0a sum: ${it.sumGraph2()}") }
+
+    dataForAdvent16.data0b.let { s -> Maze2.from(s) }
+        .also { println("dijsktra 0b should be 4013 and is: ${it.dijsktra()}") }
+        .also { println("dijsktra 0b sum: ${it.sumGraph2()}") }
+
+    dataForAdvent16.data1.let { s -> Maze2.from(s)}
+        .also { println("dijkstra 1 should be 7036 and is: ${it.dijsktra()}") }
+        .also { println("dijsktra 1 sum: ${it.sumGraph()}") }
+        .also { println("dijsktra 1 sum: ${it.sumGraph2()}") }
+
+    dataForAdvent16.data2.let { s -> Maze2.from(s)}
+        .also { println("dijkstra 2 should be 11048 and is: ${it.dijsktra()}") }
+        .also { println("dijsktra 2 sum: ${it.sumGraph()}") }
+        .also { println("dijsktra 2 sum: ${it.sumGraph2()}") }
+
     dataForAdvent16.data3.let { s -> Maze2.from(s)}
-        .also { println("dijkstra ... ${it.dijsktra()}") }
+        .also { println("dijkstra 3 should be 95444 and is:${it.dijsktra()}") }
+        .also { println("dijsktra 3 sum: ${it.sumGraph()}") }
+        .also { println("dijsktra 3 sum: ${it.sumGraph2()}") } //454,455,456
+        .also { it.printAll() }
 }
 
 private typealias Point = Pair<Int, Int>
@@ -46,7 +50,7 @@ private class Maze2 private constructor(
     val start: Point,
     val end: Point,
     val map: List<MutableList<Char>>,
-    val graph: MutableMap<Node, List<Pair<Node, Int>>>
+    val graph: MutableMap<Node, List<Path>>
 ) {
     companion object {
         fun from(s: String): Maze2 {
@@ -83,71 +87,129 @@ private class Maze2 private constructor(
 
     fun getNextNodes(
         aStart: Node,
-        visitedNodes: MutableList<Node>,
-        sumOfEdges: Int
-    ): List<Pair<Node, Int>> {
+        visitedNodes: MutableSet<Node>,
+        sumOfEdges: Int,
+        returnOnJunction: Boolean = false
+    ): List<Path> {
         visitedNodes.add(aStart)
         return listOf (
             Pair(
                 Node(Point(aStart.point.first+1,aStart.point.second), ORIENTATION.VERTICAL),
-                if (aStart.orientation == ORIENTATION.HORIZONTAL) 100001 else 1
+                if (aStart.orientation == ORIENTATION.HORIZONTAL) 1001 else 1
             ),
             Pair(
                 Node(Point(aStart.point.first,aStart.point.second+1), ORIENTATION.HORIZONTAL),
-                if (aStart.orientation == ORIENTATION.VERTICAL) 100001 else 1
+                if (aStart.orientation == ORIENTATION.VERTICAL) 1001 else 1
             ),
             Pair(
                 Node(Point(aStart.point.first-1,aStart.point.second), ORIENTATION.VERTICAL),
-                if (aStart.orientation == ORIENTATION.HORIZONTAL) 100001 else 1
+                if (aStart.orientation == ORIENTATION.HORIZONTAL) 1001 else 1
             ),
             Pair(
                 Node(Point(aStart.point.first,aStart.point.second-1), ORIENTATION.HORIZONTAL),
-                if (aStart.orientation == ORIENTATION.VERTICAL) 100001 else 1
+                if (aStart.orientation == ORIENTATION.VERTICAL) 1001 else 1
             )
         )
             .filterNot { map[it.first.point.first][it.first.point.second] == '#' }
-            .filterNot { visitedNodes.any { vp -> vp == it.first } }
+            .filterNot { visitedNodes.any { vp -> vp.point == it.first.point } }
+            .filterNot { it.first.point == start }
             .let {
                 when {
-                    aStart.point == end -> listOf(aStart to sumOfEdges)
-                    it.size == 1 -> getNextNodes(it.first().first, visitedNodes, sumOfEdges + it.first().second)
+                    aStart.point == end -> listOf(Path(aStart, sumOfEdges, visitedNodes))
+                    it.size == 1 -> getNextNodes(
+                        it.first().first,
+                        visitedNodes,
+                        sumOfEdges + it.first().second,
+                        true)
                     it.isEmpty() -> emptyList()
-                    visitedNodes.size == 1 -> it.flatMap { it2 -> getNextNodes(it2.first, visitedNodes, sumOfEdges + it2.second) }
-                    else -> listOf(aStart to sumOfEdges)
+                    returnOnJunction -> listOf(Path(aStart, sumOfEdges, visitedNodes))
+                    else -> it.flatMap { it2 -> getNextNodes(
+                        it2.first,
+                        visitedNodes.toMutableSet(),
+                        sumOfEdges + it2.second,
+                        true) }
                 }
             }
     }
 
+    var distances = mutableMapOf<Node, Int>().withDefault { Int.MAX_VALUE }
+    var countOfPaths = mutableMapOf<Node, Int>().withDefault { 0 }
+
     fun dijsktra(): List<Int?> {
-        val distances = mutableMapOf<Node, Int>().withDefault { Int.MAX_VALUE }
-        val countOfPaths = mutableMapOf<Node, Int>().withDefault { 0 }
-        val priorityQueue = PriorityQueue<Pair<Node, Int>>(compareBy { it.second })
-        val visited = mutableSetOf<Node>()
+        distances = mutableMapOf<Node, Int>().withDefault { Int.MAX_VALUE }
+        countOfPaths = mutableMapOf<Node, Int>().withDefault { 0 }
+        val priorityQueue = PriorityQueue<Path>(compareBy { it.distance })
 
         val startNode = Node(start, ORIENTATION.HORIZONTAL)
-        priorityQueue.add(startNode to 0)
+        priorityQueue.add(Path(startNode, 0, mutableSetOf(startNode)))
         distances[startNode] = 0
 
         while (priorityQueue.isNotEmpty()) {
-            val (currentNode, currentDistance) = priorityQueue.poll()
-            if (visited.contains(currentNode)) continue
-            visited.add(currentNode)
+            val path = priorityQueue.poll()
+            val currentNode = path.node
+            val currentDistance = path.distance
+            val visited = path.visitedNodes
+            if (visited.contains(currentNode) && visited.last() != currentNode) continue
+//            visited.add(currentNode)
 
-            val nextNodes = getNextNodes(currentNode, mutableListOf(), 0)
-            nextNodes.forEach { (nextNode, edgeWeight) ->
-                val newDistance = currentDistance + edgeWeight
+            val nextNodes = getNextNodes(currentNode, visited, currentDistance)
+            graph[currentNode] = nextNodes.toMutableList()
+            nextNodes.forEach { nextPath ->
+                val nextNode = nextPath.node
+                val edgeWeight = nextPath.distance
+                val edgeVisited = nextPath.visitedNodes
+                val newDistance = edgeWeight
                 if (newDistance == (distances[nextNode] ?: Int.MAX_VALUE)) {
                     countOfPaths[nextNode] = (countOfPaths[nextNode] ?: 0) + 1
                 } else if (newDistance < (distances[nextNode] ?: Int.MAX_VALUE)) {
                     countOfPaths[nextNode] = 1
                     distances[nextNode] = newDistance
-                    priorityQueue.add(nextNode to newDistance)
+                    priorityQueue.add(Path(nextNode, newDistance, edgeVisited))
                 }
             }
         }
 
         return listOf(distances[Node(end, ORIENTATION.HORIZONTAL)], distances[Node(end,ORIENTATION.VERTICAL)])
     }
+
+    fun sumGraph(toNode: Node = Node(end, ORIENTATION.HORIZONTAL)): Int = sumGraphPoints(toNode).size
+
+    fun sumGraphPoints(toNode: Node): Set<Point> {
+        val remainingNodes: Queue<Node> = LinkedList<Node>().apply { add(toNode) }
+        val allVisitedPoints = mutableSetOf<Point>()
+        while (remainingNodes.isNotEmpty()) {
+            val rNode = remainingNodes.poll()
+            val edges = mutableListOf<Pair<Node, Path>>()
+            graph.forEach {
+                val ed = it.value.find { edge -> edge.node == rNode && edge.distance == distances[edge.node] }
+                if (it.key != rNode && ed != null) {
+                    edges.add(it.key to ed)
+                    remainingNodes.add(it.key)
+                }
+            }
+            edges.forEach { (_, path) ->
+                allVisitedPoints.addAll(path.visitedNodes.map { it.point })
+            }
+        }
+        return allVisitedPoints
+    }
+
+    fun sumGraph2(): Int = sumGraph(Node(end, ORIENTATION.VERTICAL))
+
+    fun printAll() {
+        val allVisited = sumGraphPoints(Node(end, ORIENTATION.VERTICAL))
+        map.forEachIndexed { i, chars ->
+            chars.mapIndexed { j, c -> if (allVisited.contains(Point(i,j))) 'o' else c }
+                .joinToString("")
+                .also { println(it) }
+        }
+    }
+
+    data class Path(
+        val node: Node,
+        val distance: Int,
+        val visitedNodes: MutableSet<Node>
+    )
 }
 
 private fun List<MutableList<Char>>.getNeighbourPoints(aStart: Point): List<Point> =
